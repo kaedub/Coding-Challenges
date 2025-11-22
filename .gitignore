@@ -1,0 +1,31 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+build/
+dist/
+.eggs/
+*.egg-info/
+*.egg
+
+# TypeScript
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# General
+.DS_Store
+.env
