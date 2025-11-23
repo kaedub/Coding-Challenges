@@ -158,11 +158,12 @@ fn main() {
         }
     }
     println!("Messages: {}", messages.len());
-    for m in messages {
-        println!("{:#?}", m);
+    for m in &messages {
+        println!("{}: {} -> {}", m.message_type, m.sender, m.receiver);
+        println!("{}", m.content);
     }
     println!("Errors: {}", errors.len());
-    for e in errors {
+    for e in &errors {
         println!("{}", e);
     }
 }
