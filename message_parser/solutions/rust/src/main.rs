@@ -162,12 +162,14 @@ fn main() {
         },
         }
     }
-    println!("Messages: {}", messages.len());
+    println!("-----------------------");
+    println!("{} messages processed\n", messages.len());
     for m in &messages {
         println!("{}: {} -> {}", m.message_type, m.sender, m.receiver);
-        println!("{}", m.content);
+        println!("{}\n", m.content);
     }
-    println!("Errors: {}", errors.len());
+    println!("-----------------------");
+    println!("{} errors found\n", errors.len());
     for e in &errors {
         println!("{}", e);
     }

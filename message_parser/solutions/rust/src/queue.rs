@@ -24,21 +24,25 @@ pub struct QueueEntry {
 }
 
 const EMAIL: &str = "
-    To: <buxbaum.bixby.bray@email.com>  
-    From: <mordecai.oshea@email.com>
-
-    Subject: Meeting Reminder
-    Date: Mon, 21 Jun 2021 10:00:00 -0400
-
-    Body: Don't forget about our meeting tomorrow at 10 AM!
+To: <buxbaum.bixby.bray@email.com>  
+From: <mordecai.oshea@email.com>
+Subject: Meeting Reminder
+Date: Mon, 21 Jun 2021 10:00:00 -0400
+Body: Don't forget about our meeting tomorrow at 10 AM!
 ";
+
 const SMS: &str = "
-    Sender: +1234567890
-    Receiver: +0987654321
-    Date: 2021-06-21 09:00:00
-    Text: Hey! Just wanted to remind you about our meeting tomorrow at 10 AM.
+Sender: +1234567890
+Receiver: +0987654321
+Date: 2021-06-21 09:00:00
+Text: Hey! Just wanted to remind you about our meeting tomorrow at 10 AM.
 ";
-const SLACK: &str = "\"Mordecai Oshea\"->\"Buxbaum Bixby\"::2025-11-22T21:22:45Z::\"Hey! Just wanted to remind you about our meeting tomorrow at 10 AM.\"";
+
+const SLACK: &str = "
+\"Mordecai Oshea\"->\"Buxbaum Bixby\"
+2025-11-22T21:22:45Z
+\"Hey! Just wanted to remind you about our meeting tomorrow at 10 AM.\"
+";
 const INVALID: &str = "This is an invalid message format.";
 
 pub fn build_queue() -> [QueueEntry; 4] {
