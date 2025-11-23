@@ -102,18 +102,21 @@ impl Parser {
 
                 match section {
                     "To" | "Sender" => {
-                        if let Ok(val) = text {
-                            sender = val
+                        match text {
+                            Ok(v) => sender = v,
+                            Err(e) => println!("{:#?}", e),
                         }
                     }
                     "From" | "Receiver" => {
-                        if let Ok(val) = text {
-                            receiver = val
+                        match text {
+                            Ok(v) => receiver = v,
+                            Err(e) => println!("{:#?}", e),
                         }
                     }
                     "Body" | "Text" => {
-                        if let Ok(val) = text {
-                            content = val
+                        match text {
+                            Ok(v) => content = v,
+                            Err(e) => println!("{:#?}", e),
                         }
                     }
                     _ => {}
@@ -154,7 +157,9 @@ fn main() {
     for entry in queue {
         match parse_message(entry) {
             Ok(m) => messages.push(m),
-            Err(e) => errors.push(format!("{:#?}", e)),
+        Err(e) => match e {
+            ParseError::InvalidFormat(msg) => errors.push(msg),
+        },
         }
     }
     println!("Messages: {}", messages.len());
