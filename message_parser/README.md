@@ -14,30 +14,39 @@
 ## **Prompt**
 
 You are building a system that ingests different types of text messages.  
-Each source (Email, SMS, Slack, etc.) has its own raw message structure, but your system needs a single, unified output format.
+Each source (Email, SMS, Slack, etc.) has its own message structure, but your system needs a single, unified output format.
 
 ---
 
-## **Tasks**
+## **Details**
+Build a system that ingests different types of text messages (Email, SMS, Slack, etc.)
+and normalizes the valid and invalid messages.
 
-**1. Define a standard type for a parsed message**  
-(e.g., sender, content, timestamp, raw)
+Write a function processQueue that will parse each QueueItem object and output a MappedQueueResults
+object that contains valid messages and errors grouped by MessageType. A message is invalid
+if any of the required fields are empty string.
 
-**2. Define a Parser interface**  
-All parsers must implement the same `parse(raw: string)` method.
+Definitions:
+- A valid message contains a sender, receiver, and body.
+- An invalid message has empty strings in any of the required fields.
 
-**3. Implement three parsers, one for each type:**
-* Email
-* SMS
-* Slack
+Requirements:
+- Implement the processQueue function that takes an array of QueueItem objects.
+- Return a MappedQueueResults object as defined below.
 
-**4. Create a small factory or registry**  
-Returns the appropriate parser based on a string key.
 
-**5. Show working usage via a short demo function:**
-* Takes an array of `{ type, raw }`
-* Selects the correct parser
-* Outputs the normalized `ParsedMessage`
+Example MappedQueueResults structure:
+{
+  "email": {
+    "messages": [ ...valid email messages... ],
+    "errors": [ ...invalid email errors... ]
+  },
+  "sms": {
+    "messages": [ ...valid SMS messages... ],
+    "errors": [ ...invalid SMS errors... ]
+  },
+  ...
+}
 
 ---
 

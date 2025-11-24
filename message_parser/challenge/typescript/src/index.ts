@@ -34,11 +34,10 @@ import { readQueue, MessageType, QueueItem, EmailItem, SMSItem, SlackItem } from
 interface Message {
     sender: string;
     receiver: string;
-    body: string;
+    payload: string;
 }
 
 interface Error {
-    messageType: MessageType;
     errorMessage: string;
     payload: string;
 }
