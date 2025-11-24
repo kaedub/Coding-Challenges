@@ -1,39 +1,9 @@
-export enum MessageType {
-    Email="email",
-    SMS="sms",
-    Slack="slack",
-}
-
-export interface EmailItem {
-    from: string;
-    to: string;
-    datetime: Date;
-    subject: string;
-    body: string;
-}
-
-export interface SMSItem {
-    sender: string;
-    to: string;
-    text: string;
-}
-
-export interface SlackItem {
-    fromUsername: string;
-    toUsername: string;
-    timestamp: string;
-    content: string;
-}
-
-export interface QueueItem {
-    messageType: MessageType,
-    body: SlackItem | SMSItem | EmailItem,
-}
+import { MessageType, QueueItem } from "./types";
 
 const Q: QueueItem[] = [
     {
         messageType: MessageType.Email,
-        body: {
+        data: {
             from: "sender@example.com",
             to: "recipient@example.com",
             datetime: new Date(),
@@ -43,7 +13,7 @@ const Q: QueueItem[] = [
     },
     {
         messageType: MessageType.SMS,
-        body: {
+        data: {
             sender: "+0123456789",
             to: "+0987654321",
             text: "This is a test SMS.",
@@ -51,7 +21,7 @@ const Q: QueueItem[] = [
     },
     {
         messageType: MessageType.Slack,
-        body: {
+        data: {
             fromUsername: "persona",
             toUsername: "recipient",
             timestamp: new Date().toISOString(),
@@ -61,7 +31,7 @@ const Q: QueueItem[] = [
     {
         // Invalid Email (missing 'to' field)
         messageType: MessageType.Email,
-        body: {
+        data: {
             from: "sender@example.com",
             to: "",
             datetime: new Date(),
@@ -72,7 +42,7 @@ const Q: QueueItem[] = [
     {
         // Invalid SMS (null 'sender' field)
         messageType: MessageType.SMS,
-        body: {
+        data: {
             sender: "",
             to: "+0987654321",
             text: "Dead letter test SMS.",

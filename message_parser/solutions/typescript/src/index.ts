@@ -29,33 +29,28 @@ Example output structure:
 }
 */
 
-import { readQueue, MessageType, QueueItem, EmailItem, SMSItem, SlackItem } from "./queue";
-
-interface Message {
-    sender: string;
-    receiver: string;
-    body: string;
-}
-
-interface Error {
-    messageType: MessageType;
-    errorMessage: string;
-    payload: string;
-}
-
-type MappedQueueResults = Record<MessageType, {
-    messages: Message[];
-    errors: Error[];
-}>
-
-
+import { getParser } from "./parser";
+import { readQueue } from "./queue";
+import { MappedQueueResults, QueueItem } from "./types";
 
 const processQueue = async (queue: QueueItem[]): Promise<MappedQueueResults> => {
     const results = {} as MappedQueueResults;
 
-    /*
-    TODO: Implement the logic to process the queue items.
-    */
+    for (const item of queue) {
+        const parser = getParser(item.messageType);
+        const parseResult = await parser.parse(item.data as any);
+        if (!results[item.messageType]) {
+            results[item.messageType] = {
+                messages: [],
+                errors: [],
+            };
+        }
+        if (parseResult.valid && parseResult.message) {
+            results[item.messageType].messages.push(parseResult.message);
+        } else if (parseResult.error) {
+            results[item.messageType].errors.push(parseResult.error);
+        }
+    }
 
     return results;
 }
