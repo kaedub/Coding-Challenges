@@ -2,15 +2,15 @@
  * Input types
  */
 export enum MessageType {
-  Email="email",
-  SMS="sms",
-  Slack="slack",
+  Email = "email",
+  SMS = "sms",
+  Slack = "slack",
 }
 
 export interface EmailItem {
   from: string;
   to: string;
-  datetime: Date;
+  datetime: string;
   subject: string;
   body: string;
 }
@@ -40,11 +40,13 @@ export interface QueueItem {
 export interface Message {
   sender: string;
   receiver: string;
-  payload: string;
+  timestamp: Date;
+  body: string;
 }
 
 export interface FailedMessage {
   messageType: MessageType;
+  timestamp: Date;
   error: string;
 }
 
@@ -52,13 +54,3 @@ export type MappedQueueResults = Record<MessageType, {
   messages: Message[];
   failed: FailedMessage[];
 }>
-
-/**
- * Parser types - Bonus points if you use this pattern in your solution
- */
-
-export type ParserFunction<T> = (data: T) => Promise<Message>;
-
-export interface Parser<T> {
-  parse: ParserFunction<T>;
-}

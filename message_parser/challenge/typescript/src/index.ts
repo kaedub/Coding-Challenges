@@ -1,44 +1,33 @@
-/*
-Coding Challenge: Normalize messages from a mixed queue.
+/**
+Message Parsing System — Coding Challenge (45 minutes)
 
-Implement `processQueue(queue: QueueItem[]): Promise<MappedQueueResults>`.
+You are building a system that can parse different kinds of inbound messages.
+Each message type (email, SMS, Slack, etc.) arrives in its own data format,
+but the rest of the system needs a single, normalized representation of a message.
 
-Requirements:
-- For each `QueueItem`, pick the correct parser by `messageType` and map source fields to `Message { sender, receiver, payload }`.
-- A message is invalid if any of sender/receiver/content is an empty string.
-- Return a `MappedQueueResults` object: `{ [messageType]: { messages: Message[]; failed: FailedMessage[] } }`.
-- On valid message: push the normalized `Message` into `messages`.
-- On invalid message: push `{ messageType, error: "some error message" }` into `failed`.
+Your goal is to design a small, extensible message parsing framework. Complete the
+`processQueue` function in to handle an array of incoming messages of various types,
+parse them into a common format, and return the results. Currently, the function is
+a stub that returns nothing, but you will implement the full logic and return value.
 
-What to build:
-- For each `QueueItem`, call the appropriate parse function and map to `Message { sender, receiver, payload }`.
-- A message is invalid if any of sender/receiver/content is an empty string; record a failure with a clear error string.
-- Return a `MappedQueueResults` where each `MessageType` has `{ messages: Message[]; failed: FailedMessage[] }`. Buckets should exist even if the first item for a type fails.
+Your framework should:
+- Be extensible to support new message types in the future.
+- Clearly separate parsing logic for each message type.
+- Validate the input data and surface any errors in a consistent way.
+- Return a mapping of message types to arrays of normalized messages.
 
-Tips:
-- Review `types.ts` for input shapes, normalized output, and the `Parser<T>` contract.
-- Favor an extensible design (e.g., Strategy/registry of parsers) so adding a new `MessageType` only requires a new parser, not core changes.
-- Keep parsing and validation encapsulated per type.
+Take a look at ./tests/test.ts for examples of the input data formats
+and the expected normalized output.
+
 */
 
-import {
-  MappedQueueResults,
-  QueueItem,
-} from "./types";
-import { runTests } from "./tests/test";
+import { MappedQueueResults, QueueItem } from "./types";
 
-export const processQueue = async (
-  queue: QueueItem[]
-): Promise<MappedQueueResults> => {
-  const results = {} as MappedQueueResults;
-  /**
-   * START HERE!
-   */
+
+export const processQueue = async (queue: QueueItem[]): Promise<MappedQueueResults> => {
+  const results: MappedQueueResults = {} as MappedQueueResults;
+
+  // START HERE: implement the message parsing logic
+
   return results;
-};
-
-const main = async () => {
-  runTests();
-};
-
-main();
+}

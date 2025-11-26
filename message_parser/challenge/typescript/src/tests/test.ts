@@ -1,5 +1,5 @@
 import { processQueue } from "..";
-import { MessageType, MappedQueueResults, QueueItem } from "../types";
+import { MappedQueueResults, MessageType, QueueItem } from "../types";
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -7,13 +7,17 @@ function assert(condition: boolean, message: string) {
   }
 }
 
+const today = new Date();
+const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
 const Q: QueueItem[] = [
   {
     messageType: MessageType.Email,
     body: {
       from: "sender@example.com",
       to: "recipient@example.com",
-      datetime: new Date(),
+      datetime: today.toISOString(),
       subject: "Hello",
       body: "This is a test email.",
     },
@@ -31,7 +35,7 @@ const Q: QueueItem[] = [
     body: {
       fromUsername: "sender",
       toUsername: "recipient",
-      timestamp: new Date().toISOString(),
+      timestamp: yesterday.toISOString(),
       content: "This is a test Slack message.",
     },
   },
@@ -41,7 +45,7 @@ const Q: QueueItem[] = [
     body: {
       from: "sender@example.com",
       to: "",
-      datetime: new Date(),
+      datetime: lastWeek.toISOString(),
       subject: "Hello",
       body: "This is a test email.",
     },
@@ -63,12 +67,14 @@ const expectedResults: MappedQueueResults = {
       {
         sender: "sender@example.com",
         receiver: "recipient@example.com",
-        payload: "This is a test email.",
+        timestamp: today,
+        body: "This is a test email.",
       },
     ],
     failed: [
       {
         messageType: MessageType.Email,
+        timestamp: lastWeek,
         error:
           "email message error: Error: Invalid message: missing required fields",
       },
@@ -79,12 +85,14 @@ const expectedResults: MappedQueueResults = {
       {
         sender: "+0123456789",
         receiver: "+0987654321",
-        payload: "This is a test SMS.",
+        timestamp: yesterday,
+        body: "This is a test SMS.",
       },
     ],
     failed: [
       {
         messageType: MessageType.SMS,
+        timestamp: yesterday,
         error:
           "sms message error: Error: Invalid message: missing required fields",
       },
@@ -95,7 +103,8 @@ const expectedResults: MappedQueueResults = {
       {
         sender: "sender",
         receiver: "recipient",
-        payload: "This is a test Slack message.",
+        timestamp: lastWeek,
+        body: "This is a test Slack message.",
       },
     ],
     failed: [],
@@ -118,9 +127,11 @@ export const runTests = async () => {
     assert(
       JSON.stringify(results) === JSON.stringify(expectedResults),
       JSON.stringify(results, null, 2) +
-        " \n!== \n" +
-        JSON.stringify(expectedResults, null, 2)
+      " \n!== \n" +
+      JSON.stringify(expectedResults, null, 2)
     );
     console.log(JSON.stringify(results, null, 2));
   });
 };
+
+runTests();
