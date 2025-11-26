@@ -54,7 +54,7 @@ export type MappedQueueResults = Record<MessageType, {
 }>
 
 /**
- * Parser types
+ * Parser types - Bonus points if you use this pattern in your solution
  */
 
 export type ParserFunction<T> = (data: T) => Promise<Message>;

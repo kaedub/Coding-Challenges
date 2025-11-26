@@ -19,48 +19,39 @@ Each source (Email, SMS, Slack, etc.) has its own message structure, but your sy
 ---
 
 ## **Details**
-Build a system that ingests different types of text messages (Email, SMS, Slack, etc.)
-and normalizes the valid and invalid messages.
-
-Write a function processQueue that will parse each QueueItem object and output a MappedQueueResults
-object that contains valid messages and errors grouped by MessageType. A message is invalid
-if any of the required fields are empty string.
-
-Definitions:
-- A valid message contains a sender, receiver, and body.
-- An invalid message has empty strings in any of the required fields.
-
-Requirements:
-- Implement the processQueue function that takes an array of QueueItem objects.
-- Return a MappedQueueResults object as defined below.
+Build a unified, type-safe parsing interface that normalizes messages from multiple sources (Email, SMS, Slack, etc.) into a single consistent shape. Implement `processQueue(queue: QueueItem[]): MappedQueueResults` that:
+- For each `QueueItem`, selects the correct parser by `messageType` and maps source fields to `Message { sender, receiver, payload }`.
+- Treats a message as invalid if any of `sender`/`receiver`/`content` is an empty string; record a failure with a clear error string.
+- Returns a `MappedQueueResults` with shape `{ [messageType]: { messages: Message[]; failed: FailedMessage[] } }`, creating buckets even if the first item for a type fails.
 
 
 Example MappedQueueResults structure:
+```json
 {
   "email": {
     "messages": [ ...valid email messages... ],
-    "errors": [ ...invalid email errors... ]
+    "failed": [ ...invalid email failures... ]
   },
   "sms": {
     "messages": [ ...valid SMS messages... ],
-    "errors": [ ...invalid SMS errors... ]
+    "failed": [ ...invalid SMS failures... ]
   },
   ...
 }
-
+```
 ---
 
 ## **Evaluation Criteria**
 
-* Clean, well-typed interface for the parser
-* Consistent return shape across all implementations
-* Sensible choice of data structures (factory, map, classes, etc.)
-* Separation of concerns (no giant if/switch in parse methods)
-* Readability & maintainability
+* Consistent, normalized return structure
+* Ability to read code and understand APIs
+* Handling of invalid messages
+* Separation of concerns and readability
+* Clean, minimal parsing API
 
 ---
 
-## **Optional Bonus**
+## **Bonus**
 
-* Add basic error handling
-* Make the registry extensible (plugin pattern)
+* Support async parsers
+* Extensibility: strategy/registry pattern or plugin pattern, so adding a new `MessageType` only requires a new parser, not core changes.

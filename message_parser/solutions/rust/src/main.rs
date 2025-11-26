@@ -48,12 +48,6 @@ impl ParseLine for EmailParser {
 struct SMSParser;
 
 impl ParseLine for SMSParser {
-    /*
-    Sender: +1234567890
-    Receiver: +0987654321
-    Date: 2021-06-21 09:00:00
-    Text: Hey! Just wanted to remind you about our meeting tomorrow at 10 AM.
-     */
     fn parse_line(&self, section: &str, text: &str) -> Result<String, ParseError> {
         match section.trim() {
             "Sender" => Ok(text.trim().to_string()),

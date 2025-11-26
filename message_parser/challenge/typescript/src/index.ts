@@ -1,68 +1,44 @@
 /*
-Build a system that ingests different types of text messages (Email, SMS, Slack, etc.)
-and normalizes the valid and invalid messages.
+Coding Challenge: Normalize messages from a mixed queue.
 
-Write a function processQueue that will parse each message and output a MappedQueueResults
-object that contains valid messages and errors grouped by MessageType. A message is invalid
-if any of the required fields are empty string.
-
-Definitions:
-- A valid message contains a sender, receiver, and body.
-- An invalid message has empty strings in any of the required fields.
+Implement `processQueue(queue: QueueItem[]): Promise<MappedQueueResults>`.
 
 Requirements:
-- Implement the processQueue function that takes an array of QueueItem objects.
-- Return a MappedQueueResults object as defined below.
+- For each `QueueItem`, pick the correct parser by `messageType` and map source fields to `Message { sender, receiver, payload }`.
+- A message is invalid if any of sender/receiver/content is an empty string.
+- Return a `MappedQueueResults` object: `{ [messageType]: { messages: Message[]; failed: FailedMessage[] } }`.
+- On valid message: push the normalized `Message` into `messages`.
+- On invalid message: push `{ messageType, error: "some error message" }` into `failed`.
 
+What to build:
+- For each `QueueItem`, call the appropriate parse function and map to `Message { sender, receiver, payload }`.
+- A message is invalid if any of sender/receiver/content is an empty string; record a failure with a clear error string.
+- Return a `MappedQueueResults` where each `MessageType` has `{ messages: Message[]; failed: FailedMessage[] }`. Buckets should exist even if the first item for a type fails.
 
-Example output structure:
-{
-  "email": {
-    "messages": [ ...valid email messages... ],
-    "errors": [ ...invalid email errors... ]
-  },
-  "sms": {
-    "messages": [ ...valid SMS messages... ],
-    "errors": [ ...invalid SMS errors... ]
-  },
-  ...
-}
+Tips:
+- Review `types.ts` for input shapes, normalized output, and the `Parser<T>` contract.
+- Favor an extensible design (e.g., Strategy/registry of parsers) so adding a new `MessageType` only requires a new parser, not core changes.
+- Keep parsing and validation encapsulated per type.
 */
 
-import { readQueue, MessageType, QueueItem, EmailItem, SMSItem, SlackItem } from "./queue";
+import {
+  MappedQueueResults,
+  QueueItem,
+} from "./types";
+import { runTests } from "./tests/test";
 
-interface Message {
-    sender: string;
-    receiver: string;
-    payload: string;
-}
+export const processQueue = async (
+  queue: QueueItem[]
+): Promise<MappedQueueResults> => {
+  const results = {} as MappedQueueResults;
+  /**
+   * START HERE!
+   */
+  return results;
+};
 
-interface Error {
-    errorMessage: string;
-    payload: string;
-}
-
-type MappedQueueResults = Record<MessageType, {
-    messages: Message[];
-    errors: Error[];
-}>
-
-
-
-const processQueue = async (queue: QueueItem[]): Promise<MappedQueueResults> => {
-    const results = {} as MappedQueueResults;
-
-    /*
-    TODO: Implement the logic to process the queue items.
-    */
-
-    return results;
-}
-
-const main = (async () => {
-    const queue: QueueItem[] = await readQueue();
-    const results = await processQueue(queue);
-    console.log(JSON.stringify(results, null, 2));
-});
+const main = async () => {
+  runTests();
+};
 
 main();

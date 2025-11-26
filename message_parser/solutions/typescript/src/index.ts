@@ -1,64 +1,101 @@
-/*
-Build a system that ingests different types of text messages (Email, SMS, Slack, etc.)
-and normalizes the valid and invalid messages.
+import {
+  EmailItem,
+  Message,
+  MessageType,
+  MappedQueueResults,
+  Parser,
+  QueueItem,
+  SlackItem,
+  SMSItem,
+} from "./types";
+import { runTests } from "./tests/test";
 
-Write a function processQueue that will parse each message and output a MappedQueueResults
-object that contains valid messages and errors grouped by MessageType. A message is invalid
-if any of the required fields are empty string.
-
-Definitions:
-- A valid message contains a sender, receiver, and body.
-- An invalid message has empty strings in any of the required fields.
-
-Requirements:
-- Implement the processQueue function that takes an array of QueueItem objects.
-- Return a MappedQueueResults object as defined below.
-
-
-Example output structure:
-{
-  "email": {
-    "messages": [ ...valid email messages... ],
-    "errors": [ ...invalid email errors... ]
-  },
-  "sms": {
-    "messages": [ ...valid SMS messages... ],
-    "errors": [ ...invalid SMS errors... ]
-  },
-  ...
+export class ParserError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
 }
-*/
 
-import { getParser } from "./parser";
-import { readQueue } from "./queue";
-import { MappedQueueResults, QueueItem } from "./types";
+class EmailParser implements Parser<EmailItem> {
+  async parse(data: EmailItem): Promise<Message> {
+    const message: Message = {
+      sender: data.from,
+      receiver: data.to,
+      payload: data.body,
+    };
+    return message;
+  }
+}
 
-const processQueue = async (queue: QueueItem[]): Promise<MappedQueueResults> => {
-    const results = {} as MappedQueueResults;
+class SlackParser implements Parser<SlackItem> {
+  async parse(data: SlackItem): Promise<Message> {
+    const message: Message = {
+      sender: data.fromUsername,
+      receiver: data.toUsername,
+      payload: data.content,
+    };
+    return message;
+  }
+}
 
-    for (const item of queue) {
-        const parser = getParser(item.messageType);
-        const parseResult = await parser.parse(item.data as any);
-        if (!results[item.messageType]) {
-            results[item.messageType] = {
-                messages: [],
-                errors: [],
-            };
-        }
-        if (parseResult.valid && parseResult.message) {
-            results[item.messageType].messages.push(parseResult.message);
-        } else if (parseResult.error) {
-            results[item.messageType].errors.push(parseResult.error);
-        }
+class SMSParser implements Parser<SMSItem> {
+  async parse(data: SMSItem): Promise<Message> {
+    const message: Message = {
+      sender: data.sender,
+      receiver: data.to,
+      payload: data.text,
+    };
+    return message;
+  }
+}
+
+export function getParser<T>(messageType: MessageType): Parser<T> {
+  switch (messageType) {
+    case MessageType.Email:
+      return new EmailParser() as Parser<T>;
+    case MessageType.SMS:
+      return new SMSParser() as Parser<T>;
+    case MessageType.Slack:
+      return new SlackParser() as Parser<T>;
+    default:
+      throw new Error(`Unsupported message type: ${messageType}`);
+  }
+}
+
+export const processQueue = async (
+  queue: QueueItem[]
+): Promise<MappedQueueResults> => {
+  const results = {} as MappedQueueResults;
+
+  for (const item of queue) {
+    const parser = getParser(item.messageType);
+    try {
+      const message = await parser.parse(item.body as any);
+      if (!results[item.messageType]) {
+        results[item.messageType] = {
+          messages: [],
+          failed: [],
+        };
+      }
+      results[item.messageType].messages.push(message);
+    } catch (e) {
+      if (e instanceof ParserError) {
+        const errorMessage = `${item.messageType} message error: ${e}`;
+        results[item.messageType].failed.push({
+          messageType: item.messageType,
+          error: errorMessage,
+        });
+      } else {
+        throw e;
+      }
     }
+  }
 
-    return results;
-}
+  return results;
+};
 
-const main = (async () => {
-    const queue: QueueItem[] = await readQueue();
-    const results = await processQueue(queue);
-    console.log(JSON.stringify(results, null, 2));
-});
+const main = async () => {
+  runTests();
+};
 
 main();
